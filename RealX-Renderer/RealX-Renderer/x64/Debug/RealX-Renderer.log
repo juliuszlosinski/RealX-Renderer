@@ -21,7 +21,6 @@ D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(452,22
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(453,23): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(492,51): warning C4244: '=': conversion from 'float' to 'UINT8', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(555,1): warning C4305: 'argument': truncation from 'double' to 'float'
-  Texture.cpp
   main.cpp
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Window.h(61,1): warning C4312: 'type cast': conversion from 'int' to 'HBRUSH' of greater size
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): warning C4477: 'sprintf_s' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'UINT64'

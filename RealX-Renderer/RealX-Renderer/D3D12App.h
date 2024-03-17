@@ -796,6 +796,7 @@ public:
 	}
 
 	Mesh mesh01{};
+	Texture texture01{};
 
 	// Input layout Signature + Shader = Pipeline State Object (PSO) / Rendering process.
 	/*
@@ -820,8 +821,7 @@ public:
 			// Correct input layout signature + Shader.
 	*/
 
-	Texture texture01{};
-
+	
 	void LoadTextures()
 	{
 		BeginFrame();
