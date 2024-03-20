@@ -762,7 +762,7 @@ public:
 
 		EndFrame();
 	}
-
+	float value{};
 	void Render()
 	{
 		counter.GetFrameDelta();
@@ -772,10 +772,13 @@ public:
 		/**************************** TODO *****************************/
 
 		DirectX::XMFLOAT3 velocity{ 0.001f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 position = camera.getModelPosition();
+		DirectX::XMFLOAT3 position = camera.getCameraPosition();
 		DirectX::XMFLOAT3 rotation = camera.getModelRotation();
 		camera.setModelPosition(position.x + velocity.x, position.y + velocity.y, position.z + velocity.z);
-		camera.setModelRotation(rotation.x + 0.01f, rotation.y + 0.01f, rotation.z + 0.01f);
+		camera.setCameraPosition(-10, 0, 30.0f);
+		//camera.setModelRotation(rotation.x + 0.01f, rotation.y + 0.01f, rotation.z + 0.01f);
+		value += 0.01f;
+		camera.setYawAngle(value);
 		camera.Update(m_CurrentFrameIndex);
 
 		m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);

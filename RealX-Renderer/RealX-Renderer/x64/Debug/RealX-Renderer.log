@@ -1,4 +1,9 @@
-﻿  D3D12App.cpp
+﻿  Camera.cpp
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(119,1): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(195,29): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(196,16): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(197,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  D3D12App.cpp
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): warning C4477: 'sprintf_s' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'UINT64'
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): message : consider using '%lld' in the format string
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): message : consider using '%Id' in the format string
@@ -6,21 +11,9 @@ D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Mesh.h(48,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Mesh.h(96,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(119,1): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\FPSCounter.h(43,17): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(432,22): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(433,23): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(472,51): warning C4244: '=': conversion from 'float' to 'UINT8', possible loss of data
-  FPSCounter.cpp
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\FPSCounter.h(43,17): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-  main.cpp
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Window.h(61,1): warning C4312: 'type cast': conversion from 'int' to 'HBRUSH' of greater size
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): warning C4477: 'sprintf_s' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'UINT64'
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): message : consider using '%lld' in the format string
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): message : consider using '%Id' in the format string
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): message : consider using '%I64d' in the format string
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Mesh.h(48,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Mesh.h(96,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(119,1): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(195,29): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(196,16): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(197,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\FPSCounter.h(43,17): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(432,22): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(433,23): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
@@ -34,6 +27,25 @@ D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Mesh.h(48,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Mesh.h(96,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(119,1): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(195,29): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(196,16): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(197,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\FPSCounter.h(43,17): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(432,22): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(433,23): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(472,51): warning C4244: '=': conversion from 'float' to 'UINT8', possible loss of data
+  main.cpp
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Window.h(61,1): warning C4312: 'type cast': conversion from 'int' to 'HBRUSH' of greater size
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): warning C4477: 'sprintf_s' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'UINT64'
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): message : consider using '%lld' in the format string
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): message : consider using '%Id' in the format string
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\CommandFrame.h(20,18): message : consider using '%I64d' in the format string
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Mesh.h(48,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Mesh.h(96,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(119,1): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(195,29): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(196,16): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\Camera.h(197,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\FPSCounter.h(43,17): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(432,22): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
 D:\RealX-Renderer\RealX-Renderer\RealX-Renderer\RealX-Renderer\D3D12App.h(433,23): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
