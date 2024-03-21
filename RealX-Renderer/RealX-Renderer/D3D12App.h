@@ -8,6 +8,8 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "FPSCounter.h"
+#include "xess_d3d12.h"
+#include <iostream>
 
 class D3D12App
 {
@@ -518,6 +520,15 @@ class D3D12App
 		m_pSwapChain->Present(0, 0);
 	}
 
+	void Clear()
+	{
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_CurrentFrameIndex, m_RTVDescriptorSize);
+		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_pDepthStencilViewDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+		m_pCommandList->ClearRenderTargetView(rtvHandle, RENDER_TARGET_CLEAR_COLOR, 0, nullptr);
+		m_pCommandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	}
+
 	void Setup()
 	{
 		CD3DX12_RESOURCE_BARRIER transition = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -529,7 +540,7 @@ class D3D12App
 		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_pDepthStencilViewDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 		m_pCommandList->OMSetRenderTargets(1, &rtvHandle, 1, &dsvHandle);
-		m_pCommandList->ClearRenderTargetView(rtvHandle, RENDER_TARGET_CLEAR_COLOR, 0, nullptr);
+		//m_pCommandList->ClearRenderTargetView(rtvHandle, RENDER_TARGET_CLEAR_COLOR, 0, nullptr);
 		m_pCommandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 		m_pCommandList->RSSetViewports(1, &m_Viewport);
 		m_pCommandList->RSSetScissorRects(1, &m_ScissorRect);
@@ -567,6 +578,7 @@ public:
 	Mesh mesh{};
 	FPSCounter counter{};
 	Texture texture{};
+	float value{};
 
 	bool Init(HWND* pHandleToTheWindow, bool log = false)
 	{
@@ -673,12 +685,131 @@ public:
 			status = false;
 		}
 
+		InitXeSS();
+
 		camera.Init(*m_pDevice, m_Width, m_Height, FRAME_BUFFER_COUNT);
 
 		LoadMeshes();
 		LoadTextures();
 
 		return status;
+	}
+
+	xess_context_handle_t m_XessContext{ nullptr };
+	xess_2d_t m_DesiredOutputResolution{};
+	xess_2d_t m_RenderResolution{};
+	Microsoft::WRL::ComPtr<ID3D12Heap> m_pTexturesHeap;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_XessOutput[FRAME_BUFFER_COUNT];
+	const xess_quality_settings_t m_Quality{ XESS_QUALITY_SETTING_PERFORMANCE };
+
+	UINT m_rtvDescriptorSize;
+	UINT m_dsvDescriptorSize;
+	UINT m_uavDescriptorSize;
+
+	bool InitXeSS()
+	{
+		m_DesiredOutputResolution = { 1920, 1080 };
+
+		auto status = xessD3D12CreateContext(m_pDevice, &m_XessContext);
+		if (status != XESS_RESULT_SUCCESS)
+		{
+			throw std::runtime_error("Unable to create XeSS context!");
+		}
+
+		if (XESS_RESULT_WARNING_OLD_DRIVER == xessIsOptimalDriver(m_XessContext))
+		{
+			MessageBox(NULL, L"Please install the latest graphics driver from your vendor for optimal Intel(R) XeSS performance and visual quality", L"Important notice", MB_OK | MB_TOPMOST);
+		}
+
+		xess_properties_t props{};
+		status = xessGetProperties(m_XessContext, &m_DesiredOutputResolution, &props);
+		if (status != XESS_RESULT_SUCCESS)
+		{
+			throw std::runtime_error("Unable to gety XeSS props");
+		}
+
+		xess_version_t xefx_version{};
+		status = xessGetIntelXeFXVersion(m_XessContext, &xefx_version);
+		if (status != XESS_RESULT_SUCCESS)
+		{
+			throw std::runtime_error("Unable to get XeFX version");
+		}
+
+		D3D12_HEAP_DESC texturesHeapDescriptor
+		{
+			props.tempTextureHeapSize,
+			{D3D12_HEAP_TYPE_DEFAULT, D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 0, 0},
+			0, D3D12_HEAP_FLAG_ALLOW_ONLY_NON_RT_DS_TEXTURES 
+		};
+
+		HRESULT hr{};
+
+		hr = m_pDevice->CreateHeap(
+			&texturesHeapDescriptor, IID_PPV_ARGS(&m_pTexturesHeap)
+		);
+
+		if (FAILED(hr))
+		{
+			return false;
+		}
+
+		m_pTexturesHeap->SetName(L"XeSS_textures_heap");
+
+		m_uavDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		xess_d3d12_init_params_t params = {
+			/* Output width and height. */
+			m_DesiredOutputResolution,
+			/* Quality setting */
+			m_Quality,
+			/* Initialization flags. */
+			#if defined(USE_LOWRES_MV)
+			XESS_INIT_FLAG_NONE,
+			#else
+			XESS_INIT_FLAG_HIGH_RES_MV,
+			#endif
+			/* Specfies the node mask for internally created resources on
+			 * multi-adapter systems. */
+			0,
+			/* Specfies the node visibility mask for internally created resources
+			 * on multi-adapter systems. */
+			0,
+			/* Optional externally allocated buffers storage for X<sup>e</sup>SS. If NULL the
+			 * storage is allocated internally. If allocated, the heap type must be
+			 * D3D12_HEAP_TYPE_DEFAULT. This heap is not accessed by the CPU. */
+			nullptr,
+			/* Offset in the externally allocated heap for temporary buffers storage. */
+			0,
+			/* Optional externally allocated textures storage for X<sup>e</sup>SS. If NULL the
+			 * storage is allocated internally. If allocated, the heap type must be
+			 * D3D12_HEAP_TYPE_DEFAULT. This heap is not accessed by the CPU. */
+			m_pTexturesHeap.Get(),
+			/* Offset in the externally allocated heap for temporary textures storage. */
+			0,
+			/* No pipeline library */
+			NULL
+		};
+
+		status = xessD3D12Init(m_XessContext, &params);
+
+		if (status != XESS_RESULT_SUCCESS)
+		{
+			throw std::runtime_error("Unable to get XeSS props");
+		}
+
+		status = xessGetInputResolution(
+			m_XessContext,
+			&m_DesiredOutputResolution,
+			m_Quality,
+			&m_RenderResolution
+		);
+
+		if (status != XESS_RESULT_SUCCESS)
+		{
+			throw std::runtime_error("Unable to get XeSS props");
+		}
+
+		return true;
 	}
 
 	void LoadTextures()
@@ -762,23 +893,20 @@ public:
 
 		EndFrame();
 	}
-	float value{};
+
 	void Render()
 	{
 		counter.GetFrameDelta();
+		// ----------------------- First object ------------------ //
 		BeginFrame();
 		Setup();
+		Clear();
+		
 
-		/**************************** TODO *****************************/
-
-		DirectX::XMFLOAT3 velocity{ 0.001f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 position = camera.getCameraPosition();
-		DirectX::XMFLOAT3 rotation = camera.getModelRotation();
-		camera.setModelPosition(position.x + velocity.x, position.y + velocity.y, position.z + velocity.z);
-		camera.setCameraPosition(-10, 0, 30.0f);
-		//camera.setModelRotation(rotation.x + 0.01f, rotation.y + 0.01f, rotation.z + 0.01f);
-		value += 0.01f;
-		camera.setYawAngle(value);
+		value += 0.001f;
+		camera.setModelPosition(value, 0.0f, 0.0f);
+		camera.setModelRotation(value, value, value);
+		camera.setCameraPosition(0.05f, 0, 7.0f);
 		camera.Update(m_CurrentFrameIndex);
 
 		m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
@@ -788,10 +916,30 @@ public:
 		texture.Use(*m_pCommandList);					  // t0
 		mesh.Render(*m_pCommandList);
 
-		/**************************************************************/
+		End();
+		EndFrame();
+
+		/*
+		// ----------------------- Second object ------------------ //
+		BeginFrame();
+		Setup();
+
+		value += 0.001f;
+		camera.setModelPosition(value*-1, 0.0f, 0.0f);
+		camera.setModelRotation(value, value, value);
+		camera.setCameraPosition(0.05f, 0, 7.0f);
+		camera.Update(m_CurrentFrameIndex);
+
+		m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
+		m_pCommandList->SetPipelineState(m_pPipelineStateObject);
+
+		camera.Use(*m_pCommandList, m_CurrentFrameIndex); // b0
+		texture.Use(*m_pCommandList);					  // t0
+		mesh.Render(*m_pCommandList);
 
 		End();
 		EndFrame();
+		*/
 		counter.PrintFPS();
 	}
 };

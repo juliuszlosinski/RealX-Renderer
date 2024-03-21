@@ -33,6 +33,14 @@ private:
 	int m_FrameBufferCount{};
 	int* m_pCurrentFrameIndex;
 
+	DirectX::XMVECTOR m_CameraDirectionFront{};
+	DirectX::XMVECTOR m_CameraDirectionRight{};
+	DirectX::XMVECTOR m_CameraDirectionUp{};
+	DirectX::XMVECTOR m_WorldUp{};
+
+	float m_YawAngle{ 4.75f };
+	float m_PitchAngle{ 0.0f };
+
 	DirectX::XMFLOAT3 m_ModelRotation{ 0.0f, 0.0f, 0.0f };
 
 	bool InitConstantBufferResources(ID3D12Device& pDevice)
@@ -80,9 +88,9 @@ public:
 
 	void setModelPosition(float x, float y, float z)
 	{
-		m_CameraPosition.x = x;
-		m_CameraPosition.y = y;
-		m_CameraPosition.z = z;
+		m_ModelPosition.x = x * -1; // Work around for x axis.
+		m_ModelPosition.y = y;
+		m_ModelPosition.z = z;
 	}
 
 	DirectX::XMFLOAT3 getModelPosition()
@@ -104,19 +112,19 @@ public:
 
 	void setCameraPosition(float x, float y, float z)
 	{
-		m_CameraPosition.x = x;
+		m_CameraPosition.x = x * -1; // Work around for x axis.
 		m_CameraPosition.y = y;
 		m_CameraPosition.z = z;
 	}
 
-	bool Init(ID3D12Device& pDevice, int width, int height, int frameBufferCount)
+	bool Init(ID3D12Device& pDevice, int width, int height, int frameBufferCount, float farPlane = 1000.0f)
 	{
 		m_Width = width;
 		m_Height = height;
 		m_FrameBufferCount = frameBufferCount;
 		
 		// Building projection and view matrix.
-		DirectX::XMMATRIX tmpMat = DirectX::XMMatrixPerspectiveFovLH(45.0f * (3.14f / 180.0), (float)width / (float)height, 0.1f, 1000.0f);
+		DirectX::XMMATRIX tmpMat = DirectX::XMMatrixPerspectiveFovLH(45.0f * (3.14f / 180.0f), (float)width / (float)height, 0.1f, farPlane);
 		DirectX::XMStoreFloat4x4(&m_ProjectionMatrix, tmpMat); // PROJECTION MATRIX
 
 		// Setting starting camera state.
@@ -143,14 +151,6 @@ public:
 		return InitConstantBufferResources(pDevice);
 	}
 
-	DirectX::XMVECTOR m_CameraDirectionFront{};
-	DirectX::XMVECTOR m_CameraDirectionRight{};
-	DirectX::XMVECTOR m_CameraDirectionUp{};
-	DirectX::XMVECTOR m_WorldUp{};
-
-	float m_YawAngle{1.0f};
-	float m_PitchAngle{1.0f};
-
 	float getYawAngle()
 	{
 		return m_YawAngle;
@@ -171,7 +171,7 @@ public:
 	{
 		m_YawAngle = angle;
 		char msg[300];
-		sprintf_s(msg, "Yaw angle: %f \n", m_YawAngle);
+		sprintf_s(msg, "Yaw angle: %f [rad] <=> %f [deg]\n", m_YawAngle, m_YawAngle * 180.0 / 3.14f);
 		OutputDebugStringA(msg);
 	}
 
@@ -194,7 +194,7 @@ public:
 		DirectX::XMFLOAT3 front{};
 		front.x = cos(m_YawAngle) * cos(m_PitchAngle);
 		front.y = sin(m_PitchAngle);
-		front.z = sin(m_YawAngle)* cos(m_PitchAngle);
+		front.z = sin(m_YawAngle) * cos(m_PitchAngle);
 		m_CameraDirectionFront = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&front));
 		m_CameraDirectionRight = DirectX::XMVector3Cross(m_CameraDirectionFront, m_WorldUp);
 		m_CameraDirectionUp = DirectX::XMVector3Cross(m_CameraDirectionRight, m_CameraDirectionFront);
