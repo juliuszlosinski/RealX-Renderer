@@ -10,22 +10,24 @@ class Window
 		White = 1, Gray = 2, Black = 3
 	};
 
-	HWND m_Hwnd{ NULL };
-	LPCTSTR m_WindowName{ L"RXR-App" };
-	LPCTSTR m_WindowTitle{ L"RXR-Window" };
-	int m_Width{ 800 };
-	int m_Height{ 600 };
-	bool m_Fullscreen{ false };
-	bool m_Initialized{ false };
+	HWND			m_Hwnd{ NULL };
+	LPCTSTR			m_WindowName{ L"RXR-App" };
+	LPCTSTR			m_WindowTitle{ L"RXR-Window" };
+	int				m_ViewPortWidth{ 800 };
+	int				m_ViewPortHeight{ 600 };
+	bool			m_Fullscreen{ false };
+	bool			m_Initialized{ false };
 	BackGroundColor m_BackgroundColor{ Black };
 
 public:
-	Window(int width, int height)
+	// Custom constructor.
+	Window(int viewPortWidth, int viewPortHeight)
 	{
-		m_Width = width;
-		m_Height = height;
+		m_ViewPortWidth = viewPortWidth;
+		m_ViewPortHeight = viewPortHeight;
 	}
 
+	// Getting reference/ handle to the window.
 	HWND* getHandleToTheWindow()
 	{
 		if (!m_Initialized)
@@ -35,6 +37,7 @@ public:
 		return &m_Hwnd;
 	}
 
+	// Initializing the window.
 	bool Init(HINSTANCE hInstance)
 	{
 		if (m_Fullscreen)
@@ -44,8 +47,8 @@ public:
 			MONITORINFO mi = { sizeof(mi) };
 			GetMonitorInfo(hmon, &mi);
 
-			m_Width = mi.rcMonitor.right - mi.rcMonitor.left;
-			m_Height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+			m_ViewPortWidth = mi.rcMonitor.right - mi.rcMonitor.left;
+			m_ViewPortHeight = mi.rcMonitor.bottom - mi.rcMonitor.top;
 		}
 
 		WNDCLASSEX wc;
@@ -71,7 +74,7 @@ public:
 
 		m_Hwnd = CreateWindowEx(NULL, m_WindowName, m_WindowTitle,
 			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-			m_Width, m_Height, NULL, NULL, hInstance, NULL);
+			m_ViewPortWidth, m_ViewPortHeight, NULL, NULL, hInstance, NULL);
 
 		if (!m_Hwnd)
 		{
@@ -92,6 +95,7 @@ public:
 		return true;
 	}
 
+	// Processing window operations.
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (msg)

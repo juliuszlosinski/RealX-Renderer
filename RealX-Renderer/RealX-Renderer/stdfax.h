@@ -13,5 +13,8 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include "d3dx12.h"
+#include <iostream>
+#include <chrono>
+#include <string>
 
 #endif

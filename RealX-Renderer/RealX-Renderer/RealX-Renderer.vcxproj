@@ -19,42 +19,44 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="..\..\Copies\Copy 26 - XeSS\Mesh.cpp" />
     <ClCompile Include="CommandFrame.cpp" />
-    <ClCompile Include="D3D12App.cpp" />
+    <ClCompile Include="D3D12AppDefault.cpp" />
+    <ClCompile Include="D3D12AppXeSS.cpp" />
     <ClCompile Include="FPSCounter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="RealXRenderer.cpp" />
-    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="..\..\Copies\Copy 26 - XeSS\Mesh.h" />
     <ClInclude Include="CommandFrame.h" />
-    <ClInclude Include="D3D12App.h" />
+    <ClInclude Include="D3D12AppDefault.h" />
+    <ClInclude Include="D3D12AppXeSS.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="FPSCounter.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="RealXRenderer.h" />
     <ClInclude Include="stdfax.h" />
-    <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />
-    <ClInclude Include="VertexType.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl" />
+    <FxCompile Include="shaders.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="VertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="C:\Users\PanCh\Downloads\BzTuts\BzTuts\image.jpg" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
