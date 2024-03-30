@@ -10,10 +10,10 @@ class RealXRenderer
 	Window*			 m_Window{nullptr};
 	D3D12AppXeSS*	 m_D3D12AppXeSS{nullptr};
 	D3D12AppDefault* m_D3D12AppDefault{ nullptr };
-	int				 m_OutputWidth{ 1920 };
-	int				 m_OutputHeight{ 1080 };
 	int				 m_WindowWidth{ 800 };
 	int				 m_WindowHeight{ 600 };
+	int				 m_OutputWidth{ 1920 };
+	int				 m_OutputHeight{ 1080 };
 	bool		     m_XeSS{ false };
 
 public:
@@ -21,7 +21,7 @@ public:
 	RealXRenderer()
 	{
 		m_XeSS = false;
-		m_Window = new Window{m_OutputWidth, m_OutputHeight};
+		m_Window = new Window{m_OutputWidth, m_OutputHeight, L"RXR-Default-Window"};
 		if (m_XeSS) 
 		{
 			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight) };
@@ -38,14 +38,15 @@ public:
 		m_XeSS = xess;
 		m_OutputWidth = viewPortWidth;
 		m_OutputHeight = viewPortHeight;
-		m_Window = new Window{m_OutputWidth, m_OutputHeight};
 		if (m_XeSS)
 		{
 			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight) };
+			m_Window = new Window{ m_OutputWidth, m_OutputHeight, L"RXR-XeSS-Window"};
 		}
 		else 
 		{
 			m_D3D12AppDefault = new D3D12AppDefault{ m_OutputWidth, m_OutputHeight };
+			m_Window = new Window{ m_OutputWidth, m_OutputHeight, L"RXR-Default-Window"};
 		}
 	}
 
@@ -53,14 +54,15 @@ public:
 	RealXRenderer(bool xess)
 	{
 		m_XeSS = xess;
-		m_Window = new Window{ m_WindowWidth, m_WindowHeight };
 		if (m_XeSS)
 		{
 			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight) };
+			m_Window = new Window{ m_WindowWidth, m_WindowHeight, L"RXR-XeSS-Window"};
 		}
 		else
 		{
 			m_D3D12AppDefault = new D3D12AppDefault{ m_OutputWidth, m_OutputHeight };
+			m_Window = new Window{ m_WindowWidth, m_WindowHeight, L"RXR-Default-Window"};
 		}
 	}
 
