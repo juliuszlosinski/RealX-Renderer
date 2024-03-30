@@ -10,8 +10,10 @@ class RealXRenderer
 	Window*			 m_Window{nullptr};
 	D3D12AppXeSS*	 m_D3D12AppXeSS{nullptr};
 	D3D12AppDefault* m_D3D12AppDefault{ nullptr };
-	int				 m_ViewPortWidth{ 800 };
-	int				 m_ViewPortHeight{ 600 };
+	int				 m_OutputWidth{ 1920 };
+	int				 m_OutputHeight{ 1080 };
+	int				 m_WindowWidth{ 800 };
+	int				 m_WindowHeight{ 600 };
 	bool		     m_XeSS{ false };
 
 public:
@@ -19,14 +21,14 @@ public:
 	RealXRenderer()
 	{
 		m_XeSS = false;
-		m_Window = new Window{m_ViewPortWidth, m_ViewPortHeight};
+		m_Window = new Window{m_OutputWidth, m_OutputHeight};
 		if (m_XeSS) 
 		{
-			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_ViewPortWidth), static_cast<UINT>(m_ViewPortHeight) };
+			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight) };
 		}
 		else
 		{
-			m_D3D12AppDefault = new D3D12AppDefault{ m_ViewPortWidth, m_ViewPortHeight };
+			m_D3D12AppDefault = new D3D12AppDefault{ m_OutputWidth, m_OutputHeight };
 		}
 	}
 
@@ -34,16 +36,16 @@ public:
 	RealXRenderer(int viewPortWidth, int viewPortHeight, bool xess)
 	{
 		m_XeSS = xess;
-		m_ViewPortWidth = viewPortWidth;
-		m_ViewPortHeight = viewPortHeight;
-		m_Window = new Window{m_ViewPortWidth, m_ViewPortHeight};
+		m_OutputWidth = viewPortWidth;
+		m_OutputHeight = viewPortHeight;
+		m_Window = new Window{m_OutputWidth, m_OutputHeight};
 		if (m_XeSS)
 		{
-			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_ViewPortWidth), static_cast<UINT>(m_ViewPortHeight) };
+			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight) };
 		}
 		else 
 		{
-			m_D3D12AppDefault = new D3D12AppDefault{ m_ViewPortWidth, m_ViewPortHeight };
+			m_D3D12AppDefault = new D3D12AppDefault{ m_OutputWidth, m_OutputHeight };
 		}
 	}
 
@@ -51,14 +53,14 @@ public:
 	RealXRenderer(bool xess)
 	{
 		m_XeSS = xess;
-		m_Window = new Window{ m_ViewPortWidth, m_ViewPortHeight };
+		m_Window = new Window{ m_WindowWidth, m_WindowHeight };
 		if (m_XeSS)
 		{
-			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_ViewPortWidth), static_cast<UINT>(m_ViewPortHeight) };
+			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight) };
 		}
 		else
 		{
-			m_D3D12AppDefault = new D3D12AppDefault{ m_ViewPortWidth, m_ViewPortHeight };
+			m_D3D12AppDefault = new D3D12AppDefault{ m_OutputWidth, m_OutputHeight };
 		}
 	}
 

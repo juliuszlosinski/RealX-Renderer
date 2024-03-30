@@ -66,8 +66,8 @@ class D3D12AppXeSS
         float padding[52];              // 52 * 4 [B] = 208 [B]
     };                                  // Total  = 3 * 16 [B] + 208 [B] = 48 [B] + 208 [B] = 256 [B]
 
-    UINT                                    m_ViewPortWidth{};
-    UINT                                    m_ViewPortHeight{};
+    UINT                                    m_OutputWidth{};
+    UINT                                    m_OutputHeight{};
     float                                   m_AspectRatio{};
     CD3DX12_VIEWPORT                        m_ViewPort{};
     CD3DX12_RECT                            m_ScissorRect{};
@@ -142,29 +142,29 @@ public:
     // Custom constructor.
     D3D12AppXeSS(UINT width, UINT height)
     {
-        m_ViewPortWidth = width;
-        m_ViewPortHeight = height;
-        m_ViewPort = CD3DX12_VIEWPORT(0.0f, 0.0f, m_ViewPortWidth, m_ViewPortHeight);
-        m_ScissorRect = CD3DX12_RECT(0, 0, m_ViewPortWidth, m_ViewPortHeight);
+        m_OutputWidth = width;
+        m_OutputHeight = height;
+        m_ViewPort = CD3DX12_VIEWPORT(0.0f, 0.0f, m_OutputWidth, m_OutputHeight);
+        m_ScissorRect = CD3DX12_RECT(0, 0, m_OutputWidth, m_OutputHeight);
         m_RenderTargetViewDescriptorSize = 0;
         m_FrameIndex = 0;
-        m_DesiredOutputResolution = { m_ViewPortWidth, m_ViewPortHeight };
+        m_DesiredOutputResolution = { m_OutputWidth, m_OutputHeight };
         m_HaltonPointSet = GenerateHalton(2, 3, 1, 32);
-        m_AspectRatio = static_cast<float>(m_ViewPortWidth) / static_cast<float>(m_ViewPortHeight);
+        m_AspectRatio = static_cast<float>(m_OutputWidth) / static_cast<float>(m_OutputHeight);
     }
 
     // Default constructor.
     D3D12AppXeSS()
     {
-        m_ViewPortWidth = 1920;
-        m_ViewPortHeight = 1080;
-        m_ViewPort = CD3DX12_VIEWPORT(0.0f, 0.0f, m_ViewPortWidth, m_ViewPortHeight);
-        m_ScissorRect = CD3DX12_RECT(0, 0, m_ViewPortWidth, m_ViewPortHeight);
+        m_OutputWidth = 1920;
+        m_OutputHeight = 1080;
+        m_ViewPort = CD3DX12_VIEWPORT(0.0f, 0.0f, m_OutputWidth, m_OutputHeight);
+        m_ScissorRect = CD3DX12_RECT(0, 0, m_OutputWidth, m_OutputHeight);
         m_RenderTargetViewDescriptorSize = 0;
         m_FrameIndex = 0;
-        m_DesiredOutputResolution = { m_ViewPortWidth, m_ViewPortHeight };
+        m_DesiredOutputResolution = { m_OutputWidth, m_OutputHeight };
         m_HaltonPointSet = GenerateHalton(2, 3, 1, 32);
-        m_AspectRatio = static_cast<float>(m_ViewPortWidth) / static_cast<float>(m_ViewPortHeight);
+        m_AspectRatio = static_cast<float>(m_OutputWidth) / static_cast<float>(m_OutputHeight);
     }
 
 private:
@@ -258,8 +258,8 @@ private:
 
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.BufferCount = FRAME_COUNT;
-        swapChainDesc.Width = m_ViewPortWidth;
-        swapChainDesc.Height = m_ViewPortHeight;
+        swapChainDesc.Width = m_OutputWidth;
+        swapChainDesc.Height = m_OutputHeight;
         swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;

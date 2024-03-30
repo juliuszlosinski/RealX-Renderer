@@ -13,8 +13,8 @@ class Window
 	HWND			m_Hwnd{ NULL };
 	LPCTSTR			m_WindowName{ L"RXR-App" };
 	LPCTSTR			m_WindowTitle{ L"RXR-Window" };
-	int				m_ViewPortWidth{ 800 };
-	int				m_ViewPortHeight{ 600 };
+	int				m_OutputWidth{ 800 };
+	int				m_OutputHeight{ 600 };
 	bool			m_Fullscreen{ false };
 	bool			m_Initialized{ false };
 	BackGroundColor m_BackgroundColor{ Black };
@@ -23,8 +23,8 @@ public:
 	// Custom constructor.
 	Window(int viewPortWidth, int viewPortHeight)
 	{
-		m_ViewPortWidth = viewPortWidth;
-		m_ViewPortHeight = viewPortHeight;
+		m_OutputWidth = viewPortWidth;
+		m_OutputHeight = viewPortHeight;
 	}
 
 	// Getting reference/ handle to the window.
@@ -47,8 +47,8 @@ public:
 			MONITORINFO mi = { sizeof(mi) };
 			GetMonitorInfo(hmon, &mi);
 
-			m_ViewPortWidth = mi.rcMonitor.right - mi.rcMonitor.left;
-			m_ViewPortHeight = mi.rcMonitor.bottom - mi.rcMonitor.top;
+			m_OutputWidth = mi.rcMonitor.right - mi.rcMonitor.left;
+			m_OutputHeight = mi.rcMonitor.bottom - mi.rcMonitor.top;
 		}
 
 		WNDCLASSEX wc;
@@ -74,7 +74,7 @@ public:
 
 		m_Hwnd = CreateWindowEx(NULL, m_WindowName, m_WindowTitle,
 			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-			m_ViewPortWidth, m_ViewPortHeight, NULL, NULL, hInstance, NULL);
+			m_OutputWidth, m_OutputHeight, NULL, NULL, hInstance, NULL);
 
 		if (!m_Hwnd)
 		{
