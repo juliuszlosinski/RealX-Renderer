@@ -48,6 +48,9 @@ public:
 		InitCPUMonitor();
 	}
 
+	// Default constructor
+	FPSCounter(){}
+
 	// Initializing CPU monitor.
 	void InitCPUMonitor()
 	{

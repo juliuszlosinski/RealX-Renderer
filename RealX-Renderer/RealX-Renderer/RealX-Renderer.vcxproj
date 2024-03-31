@@ -38,6 +38,7 @@
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="FPSCounter.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="PrimitiveType.h" />
     <ClInclude Include="RealXRenderer.h" />
     <ClInclude Include="stdfax.h" />
     <ClInclude Include="Vertex.h" />

@@ -6,6 +6,7 @@
 #include "CommandFrame.h"
 #include "Mesh.h"
 #include "FPSCounter.h"
+#include "PrimitiveType.h"
 
 class D3D12AppDefault
 {
@@ -15,7 +16,7 @@ class D3D12AppDefault
 	int													m_CurrentFrameIndex{ 0 };
 	int													m_RenderTargetViewDescriptorSize{};
 	float												m_MovingObjectSpeed{ 0.008f };
-	float												m_ModelBarrier{ 1.5f };
+	float												m_ModelBarrier{ 1.90f };
 	float												m_AspectRatio{};
 	static const int								    FRAME_COUNT{ 2 };
 	float												RENDER_TARGET_CLEAR_COLOR[4]{ 0.0f, 0.0f, 0.0f, 0.0f };
@@ -23,9 +24,10 @@ class D3D12AppDefault
 	HWND												m_HandleToTheWindow{ nullptr };
 	D3D12_VIEWPORT										m_Viewport{};
 	D3D12_RECT											m_ScissorRect{};
-	FPSCounter											m_FPSCounter{ "d3d12_app_default_fps_counter.csv" };
+	FPSCounter											m_FPSCounter;
 	LPCWSTR												m_PathToVertexShader{ L"VertexShader.hlsl" };
 	LPCWSTR												m_PathToPixelShader{ L"PixelShader.hlsl" };
+	PrimitiveType										m_PrimitiveType{ PrimitiveType::Triangle };
 
 	// Adapters, graphics device and factory:
 	Microsoft::WRL::ComPtr<IDXGISwapChain3>				m_SwapChain{ nullptr };
@@ -646,13 +648,44 @@ class D3D12AppDefault
 	{
 		BeginFrame();
 
-		std::vector<Vertex> data = {
-			{ {0.0f, 0.25f * m_AspectRatio, 0.95f}, {1.0f, 0.0f, 0.0f, 1.0f}  },
-		   { {0.25f, -0.25f * m_AspectRatio, 0.95f}, {0.0f, 1.0f, 0.0f, 1.0f}  },
-		   { {-0.25f, -0.25f * m_AspectRatio, 0.95f}, {0.0f, 0.0f, 1.0f, 1.0f} }
-		};
+		std::vector<Vertex> data{};
+		std::vector<DWORD> indices{};
 
-		std::vector<DWORD> indices = { 0, 1, 2 };
+		switch (m_PrimitiveType)
+		{
+		case PrimitiveType::Triangle:
+			data.push_back({ {0.0f, 0.25f * m_AspectRatio, 0.95f}, {1.0f, 0.0f, 0.0f, 1.0f} });
+			data.push_back({ {0.25f, -0.25f * m_AspectRatio, 0.95f}, {0.0f, 1.0f, 0.0f, 1.0f} });
+			data.push_back({ {-0.25f, -0.25f * m_AspectRatio, 0.95f}, {0.0f, 0.0f, 1.0f, 1.0f} });
+			indices.push_back(0);
+			indices.push_back(1);
+			indices.push_back(2);
+			break;
+		case PrimitiveType::Rectangle:
+			data.push_back({ {-0.25f, -0.25f * m_AspectRatio, 0.95f}, {1.0f, 0.0f, 0.0f, 1.0f} });  // Left down
+			data.push_back({ {-0.25f, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 0.0f, 1.0f, 1.0f } });  // Left up
+			data.push_back({ {0.25f, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 1.0f, 0.0f, 1.0f} });    // Right up
+			data.push_back({ {0.25f, -0.25f * m_AspectRatio, 0.95f}, {0.25f, 0.0f, 0.25f, 1.0f} }); // Right down
+			indices.push_back(0);
+			indices.push_back(1);
+			indices.push_back(2);
+			indices.push_back(2);
+			indices.push_back(3);
+			indices.push_back(0);
+			break;
+		case PrimitiveType::Square:
+			data.push_back({ {-0.25f * m_AspectRatio, -0.25f * m_AspectRatio, 0.95f}, {1.0f, 0.0f, 0.0f, 1.0f} });  // Left down
+			data.push_back({ {-0.25f * m_AspectRatio, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 0.0f, 1.0f, 1.0f } });  // Left up
+			data.push_back({ {0.25f * m_AspectRatio, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 1.0f, 0.0f, 1.0f} });    // Right up
+			data.push_back({ {0.25f * m_AspectRatio, -0.25f * m_AspectRatio, 0.95f}, {0.25f, 0.0f, 0.25f, 1.0f} }); // Right down
+			indices.push_back(0);
+			indices.push_back(1);
+			indices.push_back(2);
+			indices.push_back(2);
+			indices.push_back(3);
+			indices.push_back(0);
+			break;
+		}
 
 		mesh.LoadMesh(*m_Device.Get(), *m_CommandList.Get(), &data, &indices);
 
@@ -660,19 +693,45 @@ class D3D12AppDefault
 	}
 
 public:
-	
 	// Custom constructor.
-	D3D12AppDefault(int width, int height)
+	D3D12AppDefault(int width, int height, PrimitiveType primitiveType)
 	{
 		m_OutputWidth = width;
 		m_OutputHeight = height;
 		m_AspectRatio = static_cast<float>(m_OutputWidth) / static_cast<float>(m_OutputHeight);
+		m_PrimitiveType = primitiveType;
+
+		switch (m_PrimitiveType)
+		{
+		case PrimitiveType::Triangle:
+			m_FPSCounter = FPSCounter("D3D12_App_Default-Triangle-fps_counter.csv");
+			break;
+		case PrimitiveType::Rectangle:
+			m_FPSCounter = FPSCounter("D3D12_App_Default-Rectangle-fps_counter.csv");
+			break;
+		case PrimitiveType::Square:
+			m_FPSCounter = FPSCounter("D3D12_App_Default-Square-fps_counter.csv");
+			break;
+		}
 	}
 
 	// Default constructor.
 	D3D12AppDefault()
 	{
 		m_AspectRatio = static_cast<float>(m_OutputWidth) / static_cast<float>(m_OutputHeight);
+
+		switch (m_PrimitiveType)
+		{
+		case PrimitiveType::Triangle:
+			m_FPSCounter = FPSCounter("D3D12_App_Default-Triangle-fps_counter.csv");
+			break;
+		case PrimitiveType::Rectangle:
+			m_FPSCounter = FPSCounter("D3D12_App_Default-Rectangle-fps_counter.csv");
+			break;
+		case PrimitiveType::Square:
+			m_FPSCounter = FPSCounter("D3D12_App_Default-Square-fps_counter.csv");
+			break;
+		}
 	}
 
 	// Initializing application.

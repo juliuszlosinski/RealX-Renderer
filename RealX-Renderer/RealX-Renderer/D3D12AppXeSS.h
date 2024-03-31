@@ -5,6 +5,7 @@
 #include "FPSCounter.h"
 #include "xess_d3d12.h"
 #include "Vertex.h"
+#include "PrimitiveType.h"
 
 class D3D12AppXeSS
 {
@@ -68,6 +69,7 @@ class D3D12AppXeSS
 
     UINT                                    m_OutputWidth{};
     UINT                                    m_OutputHeight{};
+    UINT                                    m_VerticesCount{ 3 };
     float                                   m_AspectRatio{};
     CD3DX12_VIEWPORT                        m_ViewPort{};
     CD3DX12_RECT                            m_ScissorRect{};
@@ -76,7 +78,9 @@ class D3D12AppXeSS
     Microsoft::WRL::ComPtr<IDXGIFactory4>   m_DXGIFactory{};
     DXGI_FORMAT                             m_DSVFormat{};
     DXGI_FORMAT                             m_DSVTypedFormat{};
-    FPSCounter                              m_FPSCounter{"d3d12_app_XeSS_fps_counter.csv"};
+    FPSCounter                              m_FPSCounter;
+
+    PrimitiveType                           m_PrimitiveType{ PrimitiveType::Triangle };
 
     // RESOURCES:
     Microsoft::WRL::ComPtr<ID3D12Resource>  m_RenderTargets[FRAME_COUNT];
@@ -105,7 +109,6 @@ class D3D12AppXeSS
     Microsoft::WRL::ComPtr<ID3D12Resource> m_ConstantBuffer{};
     SceneConstantBuffer                    m_ConstantBufferData{};
     UINT8*                                m_pCbvDataBegin;
-
 
     // DATA:
     std::uint32_t m_OutputIndex{ DHI_XeSSOutputSRV };
@@ -140,7 +143,7 @@ class D3D12AppXeSS
 
 public:
     // Custom constructor.
-    D3D12AppXeSS(UINT width, UINT height)
+    D3D12AppXeSS(UINT width, UINT height, PrimitiveType primitiveType)
     {
         m_OutputWidth = width;
         m_OutputHeight = height;
@@ -151,6 +154,20 @@ public:
         m_DesiredOutputResolution = { m_OutputWidth, m_OutputHeight };
         m_HaltonPointSet = GenerateHalton(2, 3, 1, 32);
         m_AspectRatio = static_cast<float>(m_OutputWidth) / static_cast<float>(m_OutputHeight);
+        m_PrimitiveType = primitiveType;
+
+        switch (m_PrimitiveType)
+        {
+        case PrimitiveType::Triangle:
+            m_FPSCounter = FPSCounter("D3D12_App_XeSS-Triangle-fps_counter.csv");
+            break;
+        case PrimitiveType::Rectangle:
+            m_FPSCounter = FPSCounter("D3D12_App_XeSS-Rectangle-fps_counter.csv");
+            break;
+        case PrimitiveType::Square:
+            m_FPSCounter = FPSCounter("D3D12_App_XeSS-Square-fps_counter.csv");
+            break;
+        }
     }
 
     // Default constructor.
@@ -165,6 +182,20 @@ public:
         m_DesiredOutputResolution = { m_OutputWidth, m_OutputHeight };
         m_HaltonPointSet = GenerateHalton(2, 3, 1, 32);
         m_AspectRatio = static_cast<float>(m_OutputWidth) / static_cast<float>(m_OutputHeight);
+        m_PrimitiveType = PrimitiveType::Triangle;
+
+        switch (m_PrimitiveType)
+        {
+        case PrimitiveType::Triangle:
+            m_FPSCounter = FPSCounter("D3D12_App_XeSS-Triangle-fps_counter.csv");
+            break;
+        case PrimitiveType::Rectangle:
+            m_FPSCounter = FPSCounter("D3D12_App_XeSS-Rectangle-fps_counter.csv");
+            break;
+        case PrimitiveType::Square:
+            m_FPSCounter = FPSCounter("D3D12_App_XeSS-Square-fps_counter.csv");
+            break;
+        }
     }
 
 private:
@@ -757,8 +788,30 @@ private:
         return true;
     }
 
-    // 12. Init Vertex Buffer.
+    // 12. Initializing vertex buffer.
     bool InitVertexBuffer()
+    {
+        switch (m_PrimitiveType)
+        {
+        case PrimitiveType::Triangle:
+            m_VerticesCount = 3;
+            return InitTriangleVertexBuffer();
+            break;
+        case PrimitiveType::Rectangle:
+            m_VerticesCount = 6;
+            return InitRectangleVertexBuffer();
+            break;
+        case PrimitiveType::Square:
+            m_VerticesCount = 6;
+            return InitSquareVertexBuffer();
+            break;
+        }
+
+        return true;
+    }
+
+    // * Initializing Triangle Vertex buffer.
+    bool InitTriangleVertexBuffer()
     {
         HRESULT hr{};
 
@@ -773,6 +826,103 @@ private:
 
         auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
         auto resourceDescriptor = CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize);
+
+
+        hr = m_Device->CreateCommittedResource(
+            &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDescriptor,
+            D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_VertexBuffer)
+        );
+        if (FAILED(hr))
+        {
+            return false;
+        }
+
+        UINT8* pVertexDataBegin{};
+        CD3DX12_RANGE readRange(0, 0);
+        hr = m_VertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin));
+        if (FAILED(hr))
+        {
+            return false;
+        }
+        memcpy(pVertexDataBegin, triangleVertices, sizeof(triangleVertices));
+        m_VertexBuffer->Unmap(0, nullptr);
+
+        m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
+        m_VertexBufferView.StrideInBytes = sizeof(Vertex);
+        m_VertexBufferView.SizeInBytes = vertexBufferSize;
+
+        return true;
+    }
+
+    // * Initializing Rectangle Vertex buffer.
+    bool InitRectangleVertexBuffer()
+    {
+        HRESULT hr{};
+
+        Vertex rectangleVertices[] =
+        {
+           { {-0.25f, -0.25f * m_AspectRatio, 0.95f}, {1.0f, 0.0f, 0.0f, 1.0f} },  // Left down
+           { {-0.25f, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 0.0f, 1.0f, 1.0f } },  // Left up
+           { {0.25f, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 1.0f, 0.0f, 1.0f} },    // Right up
+
+           { {-0.25f, -0.25f * m_AspectRatio, 0.95f}, {1.0f, 0.0f, 0.0f, 1.0f} },  // Left down
+           { {0.25f, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 1.0f, 0.0f, 1.0f} },    // Right up
+           { {0.25f, -0.25f * m_AspectRatio, 0.95f}, {0.25f, 0.0f, 0.25f, 1.0f} }  // Right down
+
+        };
+
+        const UINT vertexBufferSize = sizeof(rectangleVertices);
+
+        auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+        auto resourceDescriptor = CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize);
+
+        hr = m_Device->CreateCommittedResource(
+            &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDescriptor,
+            D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_VertexBuffer)
+        );
+        if (FAILED(hr))
+        {
+            return false;
+        }
+
+        UINT8* pVertexDataBegin{};
+        CD3DX12_RANGE readRange(0, 0);
+        hr = m_VertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin));
+        if (FAILED(hr))
+        {
+            return false;
+        }
+        memcpy(pVertexDataBegin, rectangleVertices, sizeof(rectangleVertices));
+        m_VertexBuffer->Unmap(0, nullptr);
+
+        m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
+        m_VertexBufferView.StrideInBytes = sizeof(Vertex);
+        m_VertexBufferView.SizeInBytes = vertexBufferSize;
+
+        return true;
+    }
+
+    // * Initializing Square Vertex buffer.
+    bool InitSquareVertexBuffer()
+    {
+        HRESULT hr{};
+
+        Vertex triangleVertices[] =
+        {
+            { {-0.25f * m_AspectRatio, -0.25f * m_AspectRatio, 0.95f}, {1.0f, 0.0f, 0.0f, 1.0f} },  // Left down
+            { {-0.25f * m_AspectRatio, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 0.0f, 1.0f, 1.0f } },  // Left up
+            { {0.25f * m_AspectRatio, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 1.0f, 0.0f, 1.0f} },    // Right up
+
+            { {-0.25f * m_AspectRatio, -0.25f * m_AspectRatio, 0.95f}, {1.0f, 0.0f, 0.0f, 1.0f} },  // Left down
+            { {0.25f * m_AspectRatio, 0.25f * m_AspectRatio, 0.95f}, {0.0f, 1.0f, 0.0f, 1.0f} },    // Right up
+            { {0.25f * m_AspectRatio, -0.25f * m_AspectRatio, 0.95f}, {0.25f, 0.0f, 0.25f, 1.0f} }  // Right down
+        };
+
+        const UINT vertexBufferSize = sizeof(triangleVertices);
+
+        auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+        auto resourceDescriptor = CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize);
+
 
         hr = m_Device->CreateCommittedResource(
             &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDescriptor,
@@ -1252,7 +1402,7 @@ private:
         );
         m_GraphicsCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_GraphicsCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
-        m_GraphicsCommandList->DrawInstanced(3, 1, 0, 0);
+        m_GraphicsCommandList->DrawInstanced(m_VerticesCount, 1, 0, 0);
 
         // 2. Running velocity pass --------------------------------------------------]
         m_GraphicsCommandList->SetPipelineState(m_PipelineStateVelocityPass.Get());
@@ -1277,7 +1427,7 @@ private:
         m_GraphicsCommandList->ClearRenderTargetView(rtvHandle, m_ClearColor, 0, nullptr);
         m_GraphicsCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_GraphicsCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
-        m_GraphicsCommandList->DrawInstanced(3, 1, 0, 0);
+        m_GraphicsCommandList->DrawInstanced(m_VerticesCount, 1, 0, 0);
 
         // 3. Running XeSS pass -----------------------------------------------------]
 
@@ -1354,7 +1504,7 @@ private:
         m_GraphicsCommandList->ClearRenderTargetView(rtvHandle, m_ClearColor, 0, nullptr);
         m_GraphicsCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_GraphicsCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
-        m_GraphicsCommandList->DrawInstanced(3, 1, 0, 0);
+        m_GraphicsCommandList->DrawInstanced(m_VerticesCount, 1, 0, 0);
 
         // e) Transition Render Target/ RT to present
         transition =
