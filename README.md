@@ -1,6 +1,4 @@
-**Current status:**
-
-**a) D3D12 Raw Version initial 1920x1080 [Full HD]:**
+## **1. D3D12 Raw Version initial 1920x1080 [Full HD]:**
 
 ![image](https://github.com/juliuszlosinski/RealX-Renderer/assets/72278818/3c384ab1-2343-426e-ae47-7ad1cfcf0793)
 ![image](https://github.com/juliuszlosinski/RealX-Renderer/assets/72278818/3152b669-a281-47c5-b0f1-5146d540fd7f)
@@ -14,7 +12,7 @@ https://github.com/juliuszlosinski/RealX-Renderer/blob/main/RealX-Renderer/RealX
 
 **Average: 56 [FPS]**
 
-**b) D3D12 with XeSS technology, implemented input 800x600 and desired output resolution 1920x1080 [Full HD]:**
+## **2. D3D12 with XeSS technology, implemented input 800x600 and desired output resolution 1920x1080 [Full HD]:**
 
 ![image](https://github.com/juliuszlosinski/RealX-Renderer/assets/72278818/2c2e7526-50a6-456e-a353-84af18d54512)
 ![image](https://github.com/juliuszlosinski/RealX-Renderer/assets/72278818/28c6a147-498f-480e-a16b-eeb206541c1c)
