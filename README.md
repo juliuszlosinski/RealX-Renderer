@@ -1,3 +1,5 @@
+**GOAL**: Measuring performance of D3D12 raw version vs D3D12 with XeSS technology.
+
 ## **1. D3D12 Raw Version initial 1920x1080 [Full HD]:**
 
 ![image](https://github.com/juliuszlosinski/RealX-Renderer/assets/72278818/3c384ab1-2343-426e-ae47-7ad1cfcf0793)
