@@ -7,8 +7,8 @@
 
 class RealXRenderer
 {
-	Window*			 m_Window{nullptr};
-	D3D12AppXeSS*	 m_D3D12AppXeSS{nullptr};
+	Window*			 m_Window{ nullptr };
+	D3D12AppXeSS*	 m_D3D12AppXeSS{ nullptr };
 	D3D12AppDefault* m_D3D12AppDefault{ nullptr };
 	PrimitiveType	 m_PrimitiveType{ PrimitiveType::Triangle };
 	int				 m_WindowWidth{ 800 };
@@ -22,8 +22,8 @@ public:
 	RealXRenderer()
 	{
 		m_XeSS = false;
-		m_Window = new Window{m_OutputWidth, m_OutputHeight, L"RXR-Default-Window"};
-		if (m_XeSS) 
+		m_Window = new Window{ m_OutputWidth, m_OutputHeight, L"RXR-Default-Window" };
+		if (m_XeSS)
 		{
 			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight), m_PrimitiveType };
 		}
@@ -42,13 +42,13 @@ public:
 		m_OutputHeight = viewPortHeight;
 		if (m_XeSS)
 		{
-			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight), m_PrimitiveType};
-			m_Window = new Window{ m_OutputWidth, m_OutputHeight, L"RXR-XeSS-Window"};
+			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight), m_PrimitiveType };
+			m_Window = new Window{ m_OutputWidth, m_OutputHeight, L"RXR-XeSS-Window" };
 		}
-		else 
+		else
 		{
-			m_D3D12AppDefault = new D3D12AppDefault{ m_OutputWidth, m_OutputHeight, m_PrimitiveType};
-			m_Window = new Window{ m_OutputWidth, m_OutputHeight, L"RXR-Default-Window"};
+			m_D3D12AppDefault = new D3D12AppDefault{ m_OutputWidth, m_OutputHeight, m_PrimitiveType };
+			m_Window = new Window{ m_OutputWidth, m_OutputHeight, L"RXR-Default-Window" };
 		}
 	}
 
@@ -60,12 +60,12 @@ public:
 		if (m_XeSS)
 		{
 			m_D3D12AppXeSS = new D3D12AppXeSS{ static_cast<UINT>(m_OutputWidth), static_cast<UINT>(m_OutputHeight), m_PrimitiveType };
-			m_Window = new Window{ m_WindowWidth, m_WindowHeight, L"RXR-XeSS-Window"};
+			m_Window = new Window{ m_WindowWidth, m_WindowHeight, L"RXR-XeSS-Window" };
 		}
 		else
 		{
-			m_D3D12AppDefault = new D3D12AppDefault{ m_OutputWidth, m_OutputHeight, m_PrimitiveType};
-			m_Window = new Window{ m_WindowWidth, m_WindowHeight, L"RXR-Default-Window"};
+			m_D3D12AppDefault = new D3D12AppDefault{ m_OutputWidth, m_OutputHeight, m_PrimitiveType };
+			m_Window = new Window{ m_WindowWidth, m_WindowHeight, L"RXR-Default-Window" };
 		}
 	}
 
@@ -75,7 +75,7 @@ public:
 		if (!m_Window->Init(hInstance))
 		{
 			MessageBox(0, L"Window Initialization - Failed", L"Error", MB_OK);
-				return false;
+			return false;
 		}
 		if (m_XeSS)
 		{
@@ -85,7 +85,7 @@ public:
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			if (!m_D3D12AppDefault->Init(*m_Window->getHandleToTheWindow()))
 			{
@@ -129,7 +129,7 @@ public:
 		{
 			m_D3D12AppXeSS->Exit();
 		}
-		else 
+		else
 		{
 			m_D3D12AppDefault->Exit();
 		}
@@ -139,13 +139,13 @@ public:
 	void Render()
 	{
 		OutputDebugStringA("Rendering\n");
-		
+
 		if (m_XeSS)
 		{
 			m_D3D12AppXeSS->Update();
 			m_D3D12AppXeSS->Render();
 		}
-		else 
+		else
 		{
 			m_D3D12AppDefault->Update();
 			m_D3D12AppDefault->Render();

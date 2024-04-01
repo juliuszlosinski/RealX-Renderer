@@ -5,6 +5,8 @@
 #include <fstream>
 #include "stdfax.h"
 #include "psapi.h"
+#include <nvml.h>
+#include <iomanip>
 
 class FPSCounter
 {
@@ -21,7 +23,9 @@ private:
 	ULARGE_INTEGER m_LastSystemCPU;
 	ULARGE_INTEGER m_LastUserCPU;
 	HANDLE	       m_Self;
+
 	PROCESS_MEMORY_COUNTERS_EX m_Pmc{};
+	nvmlDevice_t			   m_NVMLDevice{};
 
 public:
 	// Custom constructor.
@@ -43,13 +47,36 @@ public:
 		m_LastFrameTime = li.QuadPart;
 
 		m_LogFile.open(pathToFile);
-		m_LogFile << "Time, Frames per second [F/S], RAM usage [B], CPU usage [%]\n";
+		m_LogFile << "Time, Frames per second [F/S], RAM usage [B], CPU usage [%], GPU temperature [C], GPU utilization [%], VRAM used [B]\n";
 
 		InitCPUMonitor();
+
+		InitNVML();
 	}
 
 	// Default constructor
 	FPSCounter(){}
+
+	// Initializing NVML.
+	bool InitNVML()
+	{
+		// Initializing NVML library.
+		nvmlReturn_t result{};
+
+		result = nvmlInit();
+		if (NVML_SUCCESS != result)
+		{
+			return false;
+		}
+
+		result = nvmlDeviceGetHandleByIndex(0, &m_NVMLDevice);
+		if (NVML_SUCCESS != result)
+		{
+			return false;
+		}
+
+		return true;
+	}
 
 	// Initializing CPU monitor.
 	void InitCPUMonitor()
@@ -78,27 +105,49 @@ public:
 		return m_FrameDelta;
 	}
 
-	// Exiting fps counter.
-	void Exit()
+	// Getting current GPU temperature.
+	double getCurrentGPUTemperature()
 	{
-		m_LogFile.close();
+		unsigned int temperature{};
+
+		auto result = nvmlDeviceGetTemperature(m_NVMLDevice, NVML_TEMPERATURE_GPU, &temperature);
+		if (result != NVML_SUCCESS)
+		{
+			return -1;
+		}
+
+		return temperature;
 	}
 
-	// Printing FPS.
-	void PrintFPS()
+	// Getting GPU utilization.
+	double getCurrentGPUUtilization()
 	{
-		m_FrameId++;
-		char msg[300];
-		sprintf_s(msg, "FPS: %d \n", m_Fps);
-		OutputDebugStringA(msg);
+		nvmlUtilization_t utilization{};
 
-		GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&m_Pmc, sizeof(m_Pmc));
-		SIZE_T memoryUsed = m_Pmc.WorkingSetSize;
+		auto result = nvmlDeviceGetUtilizationRates(m_NVMLDevice, &utilization);
+		if (result != NVML_SUCCESS)
+		{
+			return -1;
+		}
 
-		m_LogFile << m_FrameId << ", " << m_Fps << ", " <<memoryUsed << ", " << getCurrentCPUUsage() << "\n";
+		return utilization.gpu;
 	}
 
-	// Get current CPU usage in %.
+	// Getting current GPU's used memory.
+	double getCurrentGPUMemoryUsed()
+	{
+		nvmlMemory_t memory{};
+
+		auto result = nvmlDeviceGetMemoryInfo(m_NVMLDevice, &memory);
+		if (result != NVML_SUCCESS)
+		{
+			return -1;
+		}
+
+		return (long) memory.used;
+	}
+
+	// Getting current CPU usage in %.
 	double getCurrentCPUUsage()
 	{
 		FILETIME ftime, fsys, fuser;
@@ -120,5 +169,28 @@ public:
 		return percent * 100;
 	}
 
+	// Exiting fps counter.
+	void Exit()
+	{
+		m_LogFile.close();
+	}
+
+	// Printing FPS.
+	void PrintFPS()
+	{
+		m_FrameId++;
+		char msg[300];
+		sprintf_s(msg, "FPS: %d \n", m_Fps);
+		OutputDebugStringA(msg);
+
+		GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&m_Pmc, sizeof(m_Pmc));
+		SIZE_T memoryUsed = m_Pmc.WorkingSetSize;
+
+		//m_LogFile << "Time, Frames per second [F/S], RAM usage [B], CPU usage [%], GPU temperature [C], GPU utilization [%], VRAM used [B]\n";
+
+		m_LogFile << m_FrameId << ", " << m_Fps << ", " <<memoryUsed << ", " 
+			<< getCurrentCPUUsage() << ", " << getCurrentGPUTemperature() << ", " 
+			<< getCurrentGPUUtilization() << ", " << (int) getCurrentGPUMemoryUsed() << "\n";
+	}
 };
 #endif
