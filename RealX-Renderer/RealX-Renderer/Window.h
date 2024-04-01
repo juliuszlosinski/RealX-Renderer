@@ -21,10 +21,11 @@ class Window
 
 public:
 	// Custom constructor.
-	Window(int viewPortWidth, int viewPortHeight)
+	Window(int viewPortWidth, int viewPortHeight, LPCTSTR windowTitle)
 	{
 		m_OutputWidth = viewPortWidth;
 		m_OutputHeight = viewPortHeight;
+		m_WindowTitle = windowTitle;
 	}
 
 	// Getting reference/ handle to the window.
